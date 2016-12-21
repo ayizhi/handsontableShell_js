@@ -1,15 +1,10 @@
 
 define(['jquery','handsontable'],function($,_Handsontable){
-    console.log(_Handsontable)
 
 //obj参数{$container:$dom , fixedColumnsLeft:'','cells':callback ,'ajaxUrl':'' }
     function HandsonTable(obj){
         var t = this;
-
-        // requirejs(['handsontable'],function(_Handsontable){
-            console.log(_Handsontable)
-            t.Handsontable = _Handsontable;
-        // })
+        t.Handsontable = _Handsontable;
 
         //基本数据
         t.reportHeaderObj = [];
@@ -52,6 +47,7 @@ define(['jquery','handsontable'],function($,_Handsontable){
         t.loadMoreDataCallback = obj['loadMoreDataCallback'] //加载更多信息的回调
         t.getTableCallback = obj['getTableCallback']//排序.搜索的回调
         t.afterRenderer = obj['afterRenderer']//渲染过后
+
 
         //初始化
         t.init();
