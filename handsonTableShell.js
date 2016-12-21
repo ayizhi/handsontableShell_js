@@ -17,23 +17,19 @@ define(['jquery','handsontable'],function($,_Handsontable){
         t.totalPageNum = '';//总体页数
         t.maxPiece = obj['maxPiece'] || 10;//最大条数
         t.minSpareRows = obj['minSpareRows'] || 0//最小行数
-
-
-        //需要提交的额外数据
-        t.extraData = obj['extraData'] || {};
-
-        //功能
         t.searchFields = obj['searchFields'] || ''; // 搜索范围（列名）,预设
         t.searchKeyword = obj['searchKeyword'] || ''; //搜索关键词
         t.orderField = obj['orderField'] || '';//排序的字段名k值
         t.orderSortKey = 'asc';//排序的顺序,初始化是asc正序,desc为倒序
+        t.fixedColumnsLeft = obj['fixedColumnsLeft'] || 1;
+        t.nestedHeaders = obj['nestedHeaders'];//因为通常要外部操作，所以需要一个return结果的function
+
+        //需要提交的额外数据
+        t.extraData = obj['extraData'] || {};
 
         //dom
         t.$reportContainer = obj['$container'] ;//容器
         t.reportTable = {};//表体
-
-        //table设置
-        t.fixedColumnsLeft = obj['fixedColumnsLeft'] || 1;
         t.ajaxUrl = obj['ajaxUrl'] || '';//获取table的ajaxurl;
 
 
@@ -41,24 +37,27 @@ define(['jquery','handsontable'],function($,_Handsontable){
         t.loadingController = false;
 
         //功能回调
-        t.cellCallback = obj['cellCallback'];//针对单元格操作
         t.wholeDealBeforeCallback = obj['wholeDealBeforeCallback'];//初始化,滚动加载,排序,搜索都要涉及到的,在建立之前
         t.wholeDealAfterCallback = obj['wholeDealAfterCallback'];//全部的回调,在建立之后
         t.loadMoreDataCallback = obj['loadMoreDataCallback'] //加载更多信息的回调
-        t.getTableCallback = obj['getTableCallback']//排序.搜索的回调
+        t.getTableCallback = obj['getTableCallback']//仅在初始化后执行一次
+
         t.afterRenderer = obj['afterRenderer']//渲染过后
+        t.cellCallback = obj['cellCallback'];//针对单元格操作
+
 
 
         //初始化
         t.init();
         t.bindEvent();
 
+        return t.reportTable;
+
     }
 
     HandsonTable.prototype = {
 
         init: function(){
-            console.log(444)
             var t = this;
             ajaxMask.open();
 
@@ -83,7 +82,6 @@ define(['jquery','handsontable'],function($,_Handsontable){
                         return
                     }
 
-
                     if(!reply.data.reportData){
                         return;
                     }
@@ -100,12 +98,6 @@ define(['jquery','handsontable'],function($,_Handsontable){
                     t.reportCol = [];
                     t.reportHeaderObj = [];
                     t.reportHeaderList = [];
-
-
-                    ////如果数据为空则返回
-                    // if(!t.reportData.length){
-                    //     return
-                    // }
 
                     //需要在所有表格操作中执行的函数
                     if(t.wholeDealBeforeCallback){
@@ -143,6 +135,7 @@ define(['jquery','handsontable'],function($,_Handsontable){
                         rowHeaders: true,
                         columns: t.reportCol,
                         colHeaders: t.reportHeader,
+                        nestedHeaders: t.nestedHeaders.call(t),
                         wordWrap: false,
                         width: t.$reportContainer.width(),
                         height: function(){
@@ -187,9 +180,13 @@ define(['jquery','handsontable'],function($,_Handsontable){
                             t.loadMoreData();
                         }
                     }
-
+                    //执行一些回调
                     if(t.wholeDealAfterCallback){
                         t.wholeDealAfterCallback.call(t,data);
+                    }
+
+                    if(t.getTableCallback){
+                        t.getTableCallback.call(t,data);
                     }
                 }
             })
@@ -255,6 +252,7 @@ define(['jquery','handsontable'],function($,_Handsontable){
                         if(t.wholeDealAfterCallback){
                             t.wholeDealAfterCallback.call(t,reply.data);
                         }
+
                     }
                 });
             }
