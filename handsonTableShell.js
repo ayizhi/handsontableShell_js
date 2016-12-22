@@ -37,8 +37,8 @@ define(['jquery','handsontable'],function($,_Handsontable){
         t.loadingController = false;
 
         //功能回调
-        t.wholeDealBeforeCallback = obj['wholeDealBeforeCallback'];//初始化,滚动加载,排序,搜索都要涉及到的,在建立之前
-        t.wholeDealAfterCallback = obj['wholeDealAfterCallback'];//全部的回调,在建立之后
+        t.wholeDealBeforeCallback = obj['wholeDealBeforeCallback'];//初始化,滚动加载,排序,搜索都要涉及到的,在render建立之前
+        t.wholeDealAfterCallback = obj['wholeDealAfterCallback'];//全部的回调,在render建立之后
         t.loadMoreDataCallback = obj['loadMoreDataCallback'] //加载更多信息的回调
         t.getTableCallback = obj['getTableCallback']//仅在初始化后执行一次
 
@@ -51,7 +51,6 @@ define(['jquery','handsontable'],function($,_Handsontable){
         t.init();
         t.bindEvent();
 
-        return t.reportTable;
 
     }
 
@@ -140,9 +139,9 @@ define(['jquery','handsontable'],function($,_Handsontable){
                         width: t.$reportContainer.width(),
                         height: function(){
                             if(t.reportData.length > t.maxPiece) {
-                                return (50 + 40 * t.maxPiece);
+                                return (50 + 40 * t.maxPiece) + 5;
                             } else {
-                                return (50 + 40 * (t.reportData.length + 1))
+                                return (50 + 40 * (t.reportData.length + 1)) + 5;
                             }
                         },
                         stretchH:'all',
@@ -240,7 +239,6 @@ define(['jquery','handsontable'],function($,_Handsontable){
                         if(t.wholeDealBeforeCallback){
                             t.wholeDealBeforeCallback.call(t,reply.data);
                         }
-
 
                         t.reportTable.render();
 
